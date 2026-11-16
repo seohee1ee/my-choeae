@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>나의 최애가 되어줘</title>
+  <meta name="description" content="아이돌의 열애설에 상처받은 모범생 소녀와 꿈을 잃은 전직 아이돌 소년의 청춘 성장 로맨스 웹툰">
+  <meta name="theme-color" content="#ff91a4">
+  <link rel="icon" href="assets/logo.png">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&display=swap">
+  <link rel="stylesheet" href="style.css?v=14">
+</head>
+<body>
+  <main class="home" id="home">
+    <div class="hearts" id="hearts" aria-hidden="true"></div>
+
+    <div class="stage" aria-hidden="true">
+      <img class="sprite" src="assets/sprite_couple.png?v=2" alt="">
+    </div>
+
+    <div class="home-logo">
+      <h1><img src="assets/logo.png" alt="나의 최애가 되어줘" width="2000" height="1324"></h1>
+    </div>
+
+    <button class="dialogue" id="dialogue" type="button" aria-label="다음 대사 보기">
+      <span class="name" id="dName"></span>
+      <span class="love" aria-hidden="true">♥ 호감도 <span class="bar"><i id="loveBar"></i></span></span>
+      <span class="line" id="dLine" aria-live="polite"></span>
+      <span class="next" aria-hidden="true">▼</span>
+    </button>
+
+    <nav class="home-nav" aria-label="메뉴">
+      <a class="tab" href="viewer.html?ep=1">1화 보러가기</a>
+      <a class="tab" href="viewer.html?ep=2">2화 보러가기</a>
+      <span class="spacer"></span>
+      <a class="tab" href="about.html">작품소개</a>
+    </nav>
+  </main>
+
+  <script>
+    // 대사창에 나오는 대사입니다. 자유롭게 고치거나 줄을 추가하세요.
+    // who: 'wooyeon'(우연) / 'jaehyun'(재현) / ''(이름표 없는 내레이션)
+    var LINES = [
+      { who: '',        text: '아이돌의 팬이었던 소녀가, 아이돌을 꿈꾸는 사람을 좋아하게 된다면?' },
+      { who: 'wooyeon', text: '최애의 열애설이라니… 내 인형은 또 어디로 떨어진 거야!' },
+      { who: 'jaehyun', text: '야, 너 뭐야?' },
+      { who: 'wooyeon', text: '(…들켰다.)' },
+      { who: 'jaehyun', text: '누나는 안 사?' },
+      { who: '',        text: '▶ 두 사람의 이야기, 1화부터 보러 가 볼까요?' }
+    ];
+    var NAMES = { wooyeon: '우연', jaehyun: '재현' };
+
+    var home = document.getElementById('home'),
+        nameEl = document.getElementById('dName'),
+        lineEl = document.getElementById('dLine'),
+        loveBar = document.getElementById('loveBar'),
+        reduce = matchMedia('(prefers-reduced-motion: reduce)').matches,
+        idx = -1, typing = null, auto = null;
+
+    function show(i) {
+      idx = (i + LINES.length) % LINES.length;
+      var l = LINES[idx];
+      home.dataset.speaker = l.who;
+      nameEl.hidden = !l.who;
+      nameEl.textContent = NAMES[l.who] || '';
+      loveBar.style.width = Math.round((idx + 1) / LINES.length * 100) + '%';
+      clearInterval(typing); clearTimeout(auto); typing = null;
+      if (reduce) { lineEl.textContent = l.text; return; }
+      var n = 0;
+      lineEl.textContent = '';
+      typing = setInterval(function () {
+        lineEl.textContent = l.text.slice(0, ++n);
+        if (n >= l.text.length) {
+          clearInterval(typing); typing = null;
+          auto = setTimeout(function () { show(idx + 1); }, 4200);   // 가만히 두면 자동으로 다음 대사
+        }
+      }, 55);
+    }
+
+    document.getElementById('dialogue').addEventListener('click', function () {
+      if (typing) {                       // 글자가 나오는 중이면 한 번에 다 보여주기
+        clearInterval(typing); typing = null;
+        lineEl.textContent = LINES[idx].text;
+        clearTimeout(auto);
+        auto = setTimeout(function () { show(idx + 1); }, 4200);
+      } else {
+        show(idx + 1);
+      }
+    });
+    show(0);
+
+    // 떠오르는 하트
+    var hearts = document.getElementById('hearts');
+    for (var h = 0; h < 16; h++) {
+      var s = document.createElement('span');
+      s.textContent = h % 4 === 3 ? '✦' : '♥';
+      s.style.left = (Math.random() * 96 + 2) + '%';
+      s.style.fontSize = (14 + Math.random() * 26) + 'px';
+      s.style.animationDuration = (9 + Math.random() * 10) + 's';
+      s.style.animationDelay = (-Math.random() * 18) + 's';
+      hearts.appendChild(s);
+    }
+  </script>
+</body>
+</html>

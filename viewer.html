@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>나의 최애가 되어줘</title>
+  <meta name="theme-color" content="#ff91a4">
+  <link rel="icon" href="assets/logo.png">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&display=swap">
+  <link rel="stylesheet" href="style.css?v=15">
+</head>
+<body class="viewer-body">
+  <header class="topbar" id="topbar">
+    <a class="pill ghost" href="index.html" aria-label="홈으로">홈</a>
+    <span class="title" id="title">나의 최애가 되어줘</span>
+    <nav aria-label="회차 이동">
+      <a class="pill" id="prevTop" href="#">이전화</a>
+      <a class="pill" id="nextTop" href="#">다음화</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="cuts" id="cuts"></div>
+    <div class="ep-end">
+      <p id="endMsg"></p>
+      <div class="row">
+        <a class="btn line" id="prevBottom" href="#">이전화</a>
+        <a class="btn" id="nextBottom" href="#">다음화</a>
+        <a class="btn line" href="index.html">홈으로</a>
+      </div>
+    </div>
+  </main>
+
+  <!-- 회차 끝에 도착하면 떠오르는 별점 말풍선 -->
+  <div class="rate-pop" id="ratePop" hidden>
+    <button class="rate-close" id="rateClose" type="button" aria-label="별점 말풍선 닫기">×</button>
+    <a class="rate" id="rate" href="#" target="_blank" rel="noopener">
+      <span class="stars" aria-hidden="true">★★★★★</span>
+      <span class="rate-text">재미있었다면 별점 남기기</span>
+      <span class="rate-sub">네이버웹툰 도전만화에서 열려요</span>
+    </a>
+  </div>
+
+  <button class="to-top" id="toTop" type="button" aria-label="맨 위로">↑</button>
+  <button class="to-top to-bottom" id="toBottom" type="button" aria-label="맨 아래로">↓</button>
+
+  <script>
+    // 회차를 추가하려면 assets/ep3 폴더에 001.jpg, 002.jpg … 를 넣고 아래에 3: 컷수 를 추가하세요.
+    var EPISODES = { 1: 15, 2: 11 };
+    // 그림을 수정해서 다시 넣었을 때 숫자를 올리면 예전 그림이 캐시에서 남지 않습니다.
+    var VERSION = 3;
+    // 회차별 네이버웹툰 주소 (별점은 네이버에서 남깁니다)
+    var NAVER = {
+      1: 'https://comic.naver.com/challenge/detail?titleId=856602&no=1',
+      2: 'https://comic.naver.com/challenge/detail?titleId=856602&no=2'
+    };
+
+    var ids = Object.keys(EPISODES).map(Number).sort(function (a, b) { return a - b; });
+    var ep = Number(new URLSearchParams(location.search).get('ep'));
+    if (!EPISODES[ep]) ep = ids[0];
+
+    document.title = ep + '화 | 나의 최애가 되어줘';
+    document.getElementById('title').textContent = '나의 최애가 되어줘 · ' + ep + '화';
+
+    var cuts = document.getElementById('cuts');
+    for (var i = 1; i <= EPISODES[ep]; i++) {
+      var img = document.createElement('img');
+      img.src = 'assets/ep' + ep + '/' + String(i).padStart(3, '0') + '.jpg?v=' + VERSION;
+      img.alt = ep + '화 ' + i + '번째 컷';
+      img.decoding = 'async';
+      if (i > 2) img.loading = 'lazy';
+      cuts.appendChild(img);
+    }
+
+    // 별점 말풍선: 회차 끝이 보이면 떠오르고, × 를 누르면 그 회차에서는 다시 안 뜹니다.
+    var pop = document.getElementById('ratePop'), rateDismissed = false;
+    if (NAVER[ep]) {
+      document.getElementById('rate').href = NAVER[ep];
+      pop.hidden = false;
+      new IntersectionObserver(function (entries) {
+        if (!rateDismissed) pop.classList.toggle('show', entries[0].isIntersecting);
+      }).observe(document.querySelector('.ep-end'));
+      document.getElementById('rateClose').addEventListener('click', function () {
+        rateDismissed = true;
+        pop.classList.remove('show');
+      });
+    }
+
+    var idx = ids.indexOf(ep), prev = ids[idx - 1], next = ids[idx + 1];
+    function link(id, target) {
+      var a = document.getElementById(id);
+      if (target) { a.href = 'viewer.html?ep=' + target; }
+      else { a.removeAttribute('href'); a.setAttribute('aria-disabled', 'true'); }
+    }
+    link('prevTop', prev); link('prevBottom', prev);
+    link('nextTop', next); link('nextBottom', next);
+    document.getElementById('endMsg').textContent =
+      next ? ep + '화 끝! 다음 화도 이어서 보세요 🍓' : ep + '화까지 봐주셔서 감사합니다 🍓';
+
+    // 내려갈 땐 상단바 숨김, 올라올 땐 다시 표시
+    var bar = document.getElementById('topbar'), toTop = document.getElementById('toTop'), last = 0;
+    addEventListener('scroll', function () {
+      var y = scrollY;
+      bar.classList.toggle('hide', y > last && y > 120);
+      toTop.classList.toggle('show', y > 800);
+      toBottom.classList.toggle('show', y + innerHeight < document.documentElement.scrollHeight - 600);
+      last = y;
+    }, { passive: true });
+    toTop.addEventListener('click', function () { scrollTo({ top: 0, behavior: 'smooth' }); });
+    var toBottom = document.getElementById('toBottom');
+    toBottom.classList.add('show');
+    toBottom.addEventListener('click', function () {
+      // 아직 안 불러온 그림이 있어도 끝까지 가도록, 회차 끝 부분으로 바로 이동
+      document.querySelector('.ep-end').scrollIntoView({ behavior: 'smooth', block: 'end' });
+    });
+  </script>
+</body>
+</html>
