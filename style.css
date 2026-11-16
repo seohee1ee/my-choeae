@@ -203,21 +203,60 @@ img { display: block; max-width: 100%; height: auto; }
   50% { transform: translateY(-10px); }
 }
 
-@media (max-width: 760px) {
-  .home-logo { top: 2vh; left: 10vw; width: 80vw; }
-  .sprite {
-    right: auto; left: 50%; bottom: auto; top: 24vh;
-    width: 114vw; height: auto; margin-left: -65vw;
-    -webkit-mask-image: none; mask-image: none;
+/* 휴대폰·세로 화면: 위에서 아래로 차곡차곡 (로고 → 그림 → 버튼 → 대사창) */
+@media (max-width: 760px), (max-aspect-ratio: 1/1) {
+  .home {
+    display: flex; flex-direction: column; align-items: stretch;
+    gap: 10px;
+    padding: 12px 14px calc(14px + env(safe-area-inset-bottom));
+    min-height: 0;
   }
-  .home-nav { top: 53.5vh; bottom: auto; width: 56vw; padding: 0; gap: 10px; }
+  .hearts { z-index: 0; }
+  .home > * { position: relative; z-index: 1; }
+  .hearts { position: absolute; z-index: 0; }
+
+  .home-logo {
+    order: 1; flex: 0 0 auto; width: auto; top: auto; left: auto;
+    display: flex; justify-content: center;
+  }
+  .home-logo h1 { width: auto; }
+  .home-logo img { width: auto; max-width: 80vw; max-height: 19dvh; }
+
+  .stage { order: 2; flex: 1 1 0; min-height: 90px; inset: auto; overflow: hidden; border-radius: 20px; }
+  .sprite {
+    position: absolute; inset: 0; right: auto; bottom: auto;
+    width: 100%; height: 100%; max-width: none;
+    object-fit: cover; object-position: 50% 8%;
+    -webkit-mask-image: linear-gradient(#000 70%, transparent 100%);
+            mask-image: linear-gradient(#000 70%, transparent 100%);
+  }
+
+  .home-nav {
+    order: 3; flex: 0 0 auto; position: relative; inset: auto; width: auto;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px 10px; padding: 0 2px 8px;
+  }
   .home-nav .spacer { display: none; }
-  .tab { height: 52px; font-size: 20px; }
-  .dialogue { left: 12px; right: 12px; bottom: 14px; width: auto; min-height: 17vh; padding: 28px 20px 26px; }
-  .dialogue .line { font-size: 19px; }
-  .dialogue .name { font-size: 19px; left: 18px; top: -20px; }
-  .love { right: 16px; }
-  .love .bar { width: 60px; }
+  .home-nav .tab:last-child { grid-column: 1 / -1; }
+  .tab {
+    height: 48px; margin: 0; padding: 0 10px 3px; font-size: 18px;
+    border: 3px solid #e8607a; border-radius: 999px;
+    box-shadow: 0 5px 0 #e8607a, inset 0 -5px 0 rgba(232, 96, 122, .22);
+    white-space: nowrap;
+  }
+  .tab:hover, .tab:focus-visible { transform: none; }
+  .tab:active { transform: translateY(4px); box-shadow: 0 1px 0 #e8607a, inset 0 -3px 0 rgba(232, 96, 122, .22); }
+  .tab::after { display: none; }
+
+  .dialogue {
+    order: 4; flex: 0 0 auto; position: relative; inset: auto; width: auto;
+    min-height: 0; margin-top: 14px; padding: 22px 18px 24px;
+    box-shadow: 0 5px 0 #e8607a, 0 10px 18px rgba(232, 96, 122, .22);
+  }
+  .dialogue .line { font-size: 17px; min-height: 3em; }
+  .dialogue .name { font-size: 18px; top: -19px; left: 16px; min-width: 80px; padding: 5px 16px 4px; }
+  .love { right: 14px; top: -15px; font-size: 13px; padding: 4px 10px; }
+  .love .bar { width: 56px; }
+  .dialogue .next { right: 16px; bottom: 8px; font-size: 15px; }
 }
 
 /* ───────── 공통 상단바 ───────── */
