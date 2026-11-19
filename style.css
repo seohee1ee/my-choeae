@@ -1,3 +1,10 @@
+/* 글씨체를 폴더 안에 함께 넣어 두어 인터넷 없이도 똑같이 보입니다 */
+@font-face { font-family: "Pretendard"; font-weight: 400; font-style: normal; font-display: swap; src: url("assets/fonts/Pretendard-Regular.otf") format("opentype"); }
+@font-face { font-family: "Pretendard"; font-weight: 600; font-style: normal; font-display: swap; src: url("assets/fonts/Pretendard-SemiBold.otf") format("opentype"); }
+@font-face { font-family: "Pretendard"; font-weight: 700; font-style: normal; font-display: swap; src: url("assets/fonts/Pretendard-Bold.otf") format("opentype"); }
+@font-face { font-family: "Pretendard"; font-weight: 800; font-style: normal; font-display: swap; src: url("assets/fonts/Pretendard-ExtraBold.otf") format("opentype"); }
+@font-face { font-family: "Jua"; font-weight: 400; font-style: normal; font-display: swap; src: url("assets/fonts/Jua.ttf") format("truetype"); }
+
 :root {
   --pink: #ff91a4;
   --pink-deep: #f7758c;
